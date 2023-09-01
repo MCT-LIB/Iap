@@ -67,13 +67,12 @@ public class CompositeComponent<C extends CompositeComponent<C>> extends Compone
      * @param <T> The type of the sub-component's view.
      * @return The sub-component's view or null if not found.
      */
-    @SuppressWarnings("unchecked")
     @Nullable
     public <T extends View> T findViewById(@IdRes int id) {
         if (view == null) {
             return null;
         }
-        return (T) view.findViewById(id);
+        return view.findViewById(id);
     }
 
     /**
@@ -158,6 +157,25 @@ public class CompositeComponent<C extends CompositeComponent<C>> extends Compone
         return (C) this;
     }
 
+    /**
+     * Binds a custom subcomponent of type {@code SubComponent} to a specific view in the layout identified by its resource ID
+     * while applying customizations using the provided customizer.
+     *
+     * @param id             The resource ID of the view to which the custom subcomponent will be bound.
+     * @param c              The custom subcomponent instance to be bound.
+     * @param customizer     A {@link Customizer} that customizes the provided subcomponent.
+     * @param <SubComponent> The type of the custom subcomponent.
+     * @return The current composite component instance with the custom subcomponent bound and customized.
+     */
+    @SuppressWarnings("unchecked")
+    public <SubComponent extends BaseComponentAdapter> C bindComponent(
+            @IdRes int id,
+            @NonNull SubComponent c,
+            @NonNull Customizer<SubComponent> customizer) {
+        customizer.customize(bindComponent(id, c));
+        return (C) this;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Component without Customizer
     ///////////////////////////////////////////////////////////////////////////
@@ -166,50 +184,64 @@ public class CompositeComponent<C extends CompositeComponent<C>> extends Compone
      * Bind a sub-component using its resource ID.
      *
      * @param id The resource ID of the sub-component's view.
-     * @return The sub-component instance.
+     * @return A {@link Component} instance bound to the specified view.
      */
     public Component<?> bindView(@IdRes int id) {
-        return getOrCreate(id, new Component<>(id));
+        return bindComponent(id, new Component<>(id));
     }
 
     /**
      * Bind a TextComponent sub-component using its resource ID.
      *
      * @param id The resource ID of the sub-component's view.
-     * @return The TextComponent sub-component instance.
+     * @return A {@link TextComponent} instance bound to the specified view.
      */
     public TextComponent<?> bindText(@IdRes int id) {
-        return getOrCreate(id, new TextComponent<>(id));
+        return bindComponent(id, new TextComponent<>(id));
     }
 
     /**
      * Bind a TimeComponent sub-component using its resource ID.
      *
      * @param id The resource ID of the sub-component's view.
-     * @return The TimeComponent sub-component instance.
+     * @return A {@link TimeComponent} instance bound to the specified view.
      */
     public TimeComponent<?> bindTime(@IdRes int id) {
-        return getOrCreate(id, new TimeComponent<>(id));
+        return bindComponent(id, new TimeComponent<>(id));
     }
 
     /**
      * Bind a DismissComponent sub-component using its resource ID.
      *
      * @param id The resource ID of the sub-component's view.
-     * @return The DismissComponent sub-component instance.
+     * @return A {@link DismissComponent} instance bound to the specified view.
      */
     public DismissComponent<?> bindDismiss(@IdRes int id) {
-        return getOrCreate(id, new DismissComponent<>(id));
+        return bindComponent(id, new DismissComponent<>(id));
     }
 
     /**
      * Bind a ClaimComponent sub-component using its resource ID.
      *
      * @param id The resource ID of the sub-component's view.
-     * @return The ClaimComponent sub-component instance.
+     * @return A {@link ClaimComponent} instance bound to the specified view.
      */
     public ClaimComponent<?> bindClaim(@IdRes int id) {
-        return getOrCreate(id, new ClaimComponent<>(id));
+        return bindComponent(id, new ClaimComponent<>(id));
+    }
+
+    /**
+     * Binds a custom subcomponent of type {@code SubComponent} to a specific view in the layout identified by its resource ID.
+     *
+     * @param id             The resource ID of the view to which the custom subcomponent will be bound.
+     * @param c              The custom subcomponent instance to be bound.
+     * @param <SubComponent> The type of the custom subcomponent.
+     * @return The custom subcomponent instance after being bound to the view.
+     */
+    public <SubComponent extends BaseComponentAdapter> SubComponent bindComponent(
+            @IdRes int id,
+            @NonNull SubComponent c) {
+        return getOrCreate(id, c);
     }
 
     ///////////////////////////////////////////////////////////////////////////

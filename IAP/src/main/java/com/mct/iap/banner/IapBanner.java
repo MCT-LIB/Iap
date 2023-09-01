@@ -118,13 +118,12 @@ public class IapBanner implements View.OnAttachStateChangeListener {
      * @param id The resource ID of the view to find.
      * @return The found View or null if not found.
      */
-    @SuppressWarnings("unchecked")
     @Nullable
     public <T extends View> T findViewById(@IdRes int id) {
         if (root == null) {
             return null;
         }
-        return (T) root.findViewById(id);
+        return root.findViewById(id);
     }
 
     /**

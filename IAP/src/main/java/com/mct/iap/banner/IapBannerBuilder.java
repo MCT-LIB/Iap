@@ -186,6 +186,23 @@ public class IapBannerBuilder {
         return this;
     }
 
+    /**
+     * Binds a custom component of type {@code C} to a specific view in the layout identified by its resource ID and applies customizations using a provided customizer.
+     *
+     * @param id         The resource ID of the view to which the custom component will be bound.
+     * @param c          The custom component instance to be bound.
+     * @param customizer The customizer used to apply specific customizations to the custom component.
+     * @param <C>        The type of the custom component.
+     * @return The builder instance for method chaining.
+     */
+    public <C extends BaseComponentAdapter> IapBannerBuilder bindComponent(
+            @IdRes int id,
+            @NonNull C c,
+            @NonNull Customizer<C> customizer) {
+        customizer.customize(bindComponent(id, c));
+        return this;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Component without Customizer
     ///////////////////////////////////////////////////////////////////////////
@@ -194,78 +211,92 @@ public class IapBannerBuilder {
      * Bind a Composite component.
      *
      * @param id The resource ID of the ViewGroup.
-     * @return The builder instance for method chaining.
+     * @return A CompositeComponent instance bound to the specified view.
      */
     public CompositeComponent<?> bindViewGroup(@IdRes int id) {
-        return getOrCreate(id, new CompositeComponent<>(id));
+        return bindComponent(id, new CompositeComponent<>(id));
     }
 
     /**
      * Bind a View component.
      *
      * @param id The resource ID of the View.
-     * @return The builder instance for method chaining.
+     * @return A Component instance bound to the specified view.
      */
     public Component<?> bindView(@IdRes int id) {
-        return getOrCreate(id, new Component<>(id));
+        return bindComponent(id, new Component<>(id));
     }
 
     /**
      * Bind a Text component.
      *
      * @param id The resource ID of the TextView.
-     * @return The builder instance for method chaining.
+     * @return A TextComponent instance bound to the specified view.
      */
     public TextComponent<?> bindText(@IdRes int id) {
-        return getOrCreate(id, new TextComponent<>(id));
+        return bindComponent(id, new TextComponent<>(id));
     }
 
     /**
      * Bind a Time component.
      *
      * @param id The resource ID of the TextView.
-     * @return The builder instance for method chaining.
+     * @return A TimeComponent instance bound to the specified view.
      */
     public TimeComponent<?> bindTime(@IdRes int id) {
-        return getOrCreate(id, new TimeComponent<>(id));
+        return bindComponent(id, new TimeComponent<>(id));
     }
 
     /**
      * Bind a Dismiss component.
      *
      * @param id The resource ID of the View.
-     * @return The builder instance for method chaining.
+     * @return A DismissComponent instance bound to the specified view.
      */
     public DismissComponent<?> bindDismiss(@IdRes int id) {
-        return getOrCreate(id, new DismissComponent<>(id));
+        return bindComponent(id, new DismissComponent<>(id));
     }
 
     /**
      * Bind a Claim component.
      *
      * @param id The resource ID of the View.
-     * @return The builder instance for method chaining.
+     * @return A ClaimComponent instance bound to the specified view.
      */
     public ClaimComponent<?> bindClaim(@IdRes int id) {
-        return getOrCreate(id, new ClaimComponent<>(id));
+        return bindComponent(id, new ClaimComponent<>(id));
     }
 
     /**
      * Bind a StatusBar component.
      *
-     * @return The builder instance for method chaining.
+     * @return A StatusBarComponent instance bound to the specified view.
      */
     public StatusBarComponent bindStatusBar() {
-        return getOrCreate(StatusBarComponent.ID, new StatusBarComponent());
+        return bindComponent(StatusBarComponent.ID, new StatusBarComponent());
     }
 
     /**
      * Bind a NavigationBar component.
      *
-     * @return The builder instance for method chaining.
+     * @return A NavigationBarComponent instance bound to the specified view.
      */
     public NavigationBarComponent bindNavigationBar() {
-        return getOrCreate(NavigationBarComponent.ID, new NavigationBarComponent());
+        return bindComponent(NavigationBarComponent.ID, new NavigationBarComponent());
+    }
+
+    /**
+     * Binds a custom component of type {@code C} to a specific view in the layout identified by its resource ID.
+     *
+     * @param id  The resource ID of the view to which the custom component will be bound.
+     * @param c   The custom component instance to be bound.
+     * @param <C> The type of the custom component.
+     * @return The bound custom component of type {@code C}.
+     */
+    public <C extends BaseComponentAdapter> C bindComponent(
+            @IdRes int id,
+            @NonNull C c) {
+        return getOrCreate(id, c);
     }
 
     ///////////////////////////////////////////////////////////////////////////
