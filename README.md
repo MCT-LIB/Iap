@@ -8,7 +8,7 @@ To integrate the IAP Banner Library into your Android project, simply add the li
 
 <pre>
 dependencies {
-    implementation 'com.example:iap-banner-library:$latest-version'
+    implementation 'com.github.MCT-LIB:Iap:$latest-tag'
 }
 </pre>
 
