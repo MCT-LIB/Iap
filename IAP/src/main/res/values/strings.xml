@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="n_per_period">%s/%s</string>
+    <string name="only_n_per_period">Only %s/%s</string>
+
+    <string name="period_day">day</string>
+    <string name="period_week">week</string>
+    <string name="period_month">month</string>
+    <string name="period_quarter">3 month</string>
+    <string name="period_half_year">6 month</string>
+    <string name="period_year">year</string>
+    <string name="period_life_time">life time</string>
+
+</resources>
