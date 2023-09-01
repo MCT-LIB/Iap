@@ -61,6 +61,7 @@ public class IapBanner implements View.OnAttachStateChangeListener {
         root.removeOnAttachStateChangeListener(this);
         root.addOnAttachStateChangeListener(this);
 
+        countdown.release();
         countdown.init();
         for (Map.Entry<Integer, BaseComponent> component : components.entrySet()) {
             component.getValue().init(this, root);

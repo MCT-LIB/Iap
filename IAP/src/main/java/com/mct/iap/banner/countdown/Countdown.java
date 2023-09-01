@@ -6,7 +6,7 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.mct.iap.utils.ConvertUtils;
+import com.mct.iap.utils.TimeCurrencyUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,37 +97,49 @@ public class Countdown {
                 if (!isCountDown) {
                     return;
                 }
-                if ((time -= ConvertUtils.ONE_SECOND) <= 0) {
+                if ((time -= TimeCurrencyUtils.ONE_SECOND) <= 0) {
                     time = 0;
                 }
-                notifyListener();
+                notifyTimeChanged();
                 if (time == 0) {
                     stopCountDown();
                     return;
                 }
-                handler.postDelayed(this, ConvertUtils.ONE_SECOND);
+                handler.postDelayed(this, TimeCurrencyUtils.ONE_SECOND);
             }
         };
     }
 
     /**
-     * Check if the countdown timer is active.
-     *
-     * @return `true` if the countdown is active, `false` otherwise.
+     * Initialize the countdown timer and reset the time to the initial value.
      */
-    public boolean isCountDown() {
-        return isCountDown;
+    public void init() {
+        time = initTime;
+    }
+
+    /**
+     * Release and stop the countdown timer, clearing all listeners.
+     */
+    public void release() {
+        stopCountDown();
+        if (countDownListeners != null) {
+            countDownListeners.clear();
+            countDownListeners = null;
+        }
+        if (countDownMilliListeners != null) {
+            countDownMilliListeners.clear();
+            countDownMilliListeners = null;
+        }
+        milliHandler = null;
     }
 
     /**
      * Set the initial time for the countdown.
      *
      * @param time The initial time in milliseconds.
-     * @return The Countdown instance for method chaining.
      */
-    public Countdown setTime(long time) {
+    public void setTime(long time) {
         this.initTime = this.time = time;
-        return this;
     }
 
     /**
@@ -142,10 +154,19 @@ public class Countdown {
     /**
      * Get the current time remaining in the countdown.
      *
-     * @return The current time in milliseconds.
+     * @return The current time remaining in milliseconds.
      */
     public long getTime() {
         return time;
+    }
+
+    /**
+     * Check if the countdown timer is active.
+     *
+     * @return `true` if the countdown is active, `false` otherwise.
+     */
+    public boolean isCountDown() {
+        return isCountDown;
     }
 
     /**
@@ -228,48 +249,30 @@ public class Countdown {
     }
 
     /**
-     * Initialize the countdown timer and reset the time to the initial value.
-     */
-    public void init() {
-        release();
-        time = initTime;
-    }
-
-    /**
-     * Release and stop the countdown timer, clearing all listeners.
-     */
-    public void release() {
-        stopCountDown();
-        if (countDownListeners != null) {
-            countDownListeners.clear();
-            countDownListeners = null;
-        }
-        if (countDownMilliListeners != null) {
-            countDownMilliListeners.clear();
-            countDownMilliListeners = null;
-        }
-        milliHandler = null;
-    }
-
-    /**
      * Notify registered listeners about countdown updates.
      */
-    private void notifyListener() {
-        if (countDownListeners != null) {
-            int[] times = ConvertUtils.convertTime(time);
-            for (CountDownListener listener : countDownListeners) {
-                listener.onCountDown(times[0], times[1], times[2]);
-            }
+    private void notifyTimeChanged() {
+        sendTimeListener();
+        sendTimeMillisecondListener();
+    }
+
+    private void sendTimeListener() {
+        if (countDownListeners == null) {
+            return;
         }
-        if (countDownMilliListeners != null && !countDownMilliListeners.isEmpty()) {
-            sendTimeMillisecond();
+        int[] times = TimeCurrencyUtils.splitTime(time);
+        for (CountDownListener listener : countDownListeners) {
+            listener.onCountDown(times[0], times[1], times[2]);
         }
     }
 
     /**
      * Send countdown updates to millisecond listeners.
      */
-    private void sendTimeMillisecond() {
+    private void sendTimeMillisecondListener() {
+        if (countDownMilliListeners == null || countDownMilliListeners.isEmpty()) {
+            return;
+        }
         Handler handler = getOrCreateMilliHandler();
         for (int i = 0; i < 10; i++) {
             int what = i;

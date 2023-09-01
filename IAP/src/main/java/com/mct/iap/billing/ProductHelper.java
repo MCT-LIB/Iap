@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.android.billingclient.api.ProductDetails;
-import com.mct.iap.utils.ConvertUtils;
+import com.mct.iap.utils.TimeCurrencyUtils;
 
 public class ProductHelper {
 
@@ -86,7 +86,7 @@ public class ProductHelper {
     }
 
     public String getFormattedPrice(float price) {
-        return ConvertUtils.formatMoney(price, priceCurrencyCode);
+        return TimeCurrencyUtils.formatMoney(price, priceCurrencyCode);
     }
 
     public String getPeriodTitle(@NonNull Context context) {
