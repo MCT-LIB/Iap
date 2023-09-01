@@ -28,11 +28,11 @@ This library includes the following utility classes:
 
 - `TextComponent`: A class that facilitates text-related operations, including text formatting, styling, and highlighting.
 
-- `TimeComponent`: An extension of `TextComponent` specifically designed for displaying and managing countdown timers.
+- `TimeComponent`: An extension of `TextComponent` specifically designed for displaying countdown timers.
 
 - `ClaimComponent`: A class for managing payments and transactions within your app.
 
-- `DismissComponent`: Allows you to easily create buttons to dismiss and hide components within an `IapBanner`.
+- `DismissComponent`: Allows you to dismiss banner.
 
 - `SystemBarComponent`, `StatusBarComponent`, and `NavigationBarComponent`: Classes that enable customization of the Android system status bar and navigation bar on Android devices.
 
