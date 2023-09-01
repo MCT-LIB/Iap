@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/MCT-LIB/Iap.svg)](https://jitpack.io/#MCT-LIB/Iap)
+
 # IAP Banner Library
 
 The **IAP Banner Library** is a versatile and user-friendly library for quickly setting up in-app purchase (IAP) banners in your Android applications. It simplifies the process of creating IAP banners with a variety of components to enhance your app's user experience. This library offers components like `TextComponent`, `TimeComponent`, `DismissComponent`, `ClaimComponent`, `StatusBarComponent`, `NavigationBarComponent` and helper dialog `IapBannerDialog`.
@@ -7,8 +9,15 @@ The **IAP Banner Library** is a versatile and user-friendly library for quickly 
 To integrate the IAP Banner Library into your Android project, simply add the library as a dependency in your app's build.gradle file:
 
 <pre>
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 dependencies {
-    implementation 'com.github.MCT-LIB:Iap:$latest-tag'
+    implementation 'com.github.MCT-LIB:Iap:$TAG'
 }
 </pre>
 
