@@ -175,6 +175,22 @@ public class TextComponent<C extends TextComponent<C>> extends Component<C> {
         return (C) this;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public String getHighlightText() {
+        return highlightText;
+    }
+
+    public int getHighlightFlag() {
+        return highlightFlag;
+    }
+
+    public int getHighlightColor() {
+        return highlightColor;
+    }
+
     /**
      * Set the text for the TextComponent, applying the specified text style.
      */

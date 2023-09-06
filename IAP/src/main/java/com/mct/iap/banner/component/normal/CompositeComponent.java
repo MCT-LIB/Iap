@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.mct.iap.banner.Customizer;
 import com.mct.iap.banner.IapBanner;
+import com.mct.iap.banner.IapBannerBuilder;
 import com.mct.iap.banner.component.BaseComponent;
 import com.mct.iap.banner.component.BaseComponentAdapter;
 
@@ -131,6 +132,20 @@ public class CompositeComponent<C extends CompositeComponent<C>> extends Compone
         return (C) this;
     }
 
+
+    /**
+     * Bind and customize a LazyTextComponent sub-component using a customizer.
+     *
+     * @param id         The resource ID of the TextView.
+     * @param customizer The Customizer for configuring the component.
+     * @return The composite component instance to enable method chaining.
+     */
+    @SuppressWarnings("unchecked")
+    public C bindLazyText(@IdRes int id, @NonNull Customizer<LazyTextComponent<?>> customizer) {
+        customizer.customize(bindLazyText(id));
+        return (C) this;
+    }
+
     /**
      * Bind and customize a DismissComponent sub-component using a customizer.
      *
@@ -208,6 +223,16 @@ public class CompositeComponent<C extends CompositeComponent<C>> extends Compone
      */
     public TimeComponent<?> bindTime(@IdRes int id) {
         return bindComponent(id, new TimeComponent<>(id));
+    }
+
+    /**
+     * Bind a LazyText component.
+     *
+     * @param id The resource ID of the TextView.
+     * @return A LazyTextComponent instance bound to the specified view.
+     */
+    public LazyTextComponent<?> bindLazyText(@IdRes int id) {
+        return bindComponent(id, new LazyTextComponent<>(id));
     }
 
     /**

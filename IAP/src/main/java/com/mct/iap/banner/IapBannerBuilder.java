@@ -1,5 +1,6 @@
 package com.mct.iap.banner;
 
+import android.app.Activity;
 import android.content.Context;
 
 import androidx.annotation.IdRes;
@@ -8,10 +9,12 @@ import androidx.annotation.NonNull;
 
 import com.mct.iap.banner.component.BaseComponent;
 import com.mct.iap.banner.component.BaseComponentAdapter;
+import com.mct.iap.banner.component.billing.BillingComponent;
 import com.mct.iap.banner.component.normal.ClaimComponent;
 import com.mct.iap.banner.component.normal.Component;
 import com.mct.iap.banner.component.normal.CompositeComponent;
 import com.mct.iap.banner.component.normal.DismissComponent;
+import com.mct.iap.banner.component.normal.LazyTextComponent;
 import com.mct.iap.banner.component.normal.TextComponent;
 import com.mct.iap.banner.component.normal.TimeComponent;
 import com.mct.iap.banner.component.system.NavigationBarComponent;
@@ -141,6 +144,18 @@ public class IapBannerBuilder {
     }
 
     /**
+     * Bind a LazyText component and apply customizations using a Customizer.
+     *
+     * @param id         The resource ID of the TextView.
+     * @param customizer The Customizer for configuring the component.
+     * @return The builder instance for method chaining.
+     */
+    public IapBannerBuilder bindLazyText(@IdRes int id, @NonNull Customizer<LazyTextComponent<?>> customizer) {
+        customizer.customize(bindLazyText(id));
+        return this;
+    }
+
+    /**
      * Bind a Dismiss component and apply customizations using a Customizer.
      *
      * @param id         The resource ID of the View.
@@ -183,6 +198,18 @@ public class IapBannerBuilder {
      */
     public IapBannerBuilder bindNavigationBar(@NonNull Customizer<NavigationBarComponent> customizer) {
         customizer.customize(bindNavigationBar());
+        return this;
+    }
+
+    /**
+     * Bind a Billing component and apply customizations using a Customizer.
+     *
+     * @param activity   Activity to launchBillingFlow.
+     * @param customizer The Customizer for configuring the component.
+     * @return A BillingComponent instance to manager billing process.
+     */
+    public IapBannerBuilder bindBilling(@NonNull Activity activity, @NonNull Customizer<BillingComponent> customizer) {
+        customizer.customize(bindBilling(activity));
         return this;
     }
 
@@ -248,6 +275,16 @@ public class IapBannerBuilder {
     }
 
     /**
+     * Bind a LazyText component.
+     *
+     * @param id The resource ID of the TextView.
+     * @return A LazyTextComponent instance bound to the specified view.
+     */
+    public LazyTextComponent<?> bindLazyText(@IdRes int id) {
+        return bindComponent(id, new LazyTextComponent<>(id));
+    }
+
+    /**
      * Bind a Dismiss component.
      *
      * @param id The resource ID of the View.
@@ -283,6 +320,16 @@ public class IapBannerBuilder {
      */
     public NavigationBarComponent bindNavigationBar() {
         return bindComponent(NavigationBarComponent.ID, new NavigationBarComponent());
+    }
+
+    /**
+     * Bind a Billing component.
+     *
+     * @param activity Activity to launchBillingFlow.
+     * @return A BillingComponent instance to manager billing process.
+     */
+    public BillingComponent bindBilling(@NonNull Activity activity) {
+        return bindComponent(BillingComponent.ID, new BillingComponent(activity));
     }
 
     /**

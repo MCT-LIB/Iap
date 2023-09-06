@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="iap_component_sys_bar_status" type="id" />
+    <item name="iap_component_sys_bar_nav" type="id" />
+    <item name="iap_component_billing" type="id" />
+
+</resources>

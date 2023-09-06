@@ -8,6 +8,8 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
+import com.mct.iap.R;
+
 /**
  * StatusBarComponent - A component for customizing the status bar of an IapBanner.
  * <p>
@@ -37,7 +39,7 @@ public class StatusBarComponent extends SystemBarComponent<StatusBarComponent> {
     /**
      * The ID for the status bar component.
      */
-    public static final int ID = android.R.id.statusBarBackground;
+    public static final int ID = R.id.iap_component_sys_bar_status;
 
     public StatusBarComponent() {
     }

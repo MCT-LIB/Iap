@@ -14,24 +14,24 @@ import com.mct.iap.banner.IapBanner;
 import com.mct.iap.banner.IapBannerBuilder;
 import com.mct.iap.banner.component.normal.Component;
 import com.mct.iap.banner.component.normal.CompositeComponent;
-import com.mct.iap.billing.BillingPeriod;
-import com.mct.iap.billing.ProductHelper;
+import com.mct.iap.banner.utils.BillingPeriod;
+import com.mct.iap.banner.utils.ProductCurrency;
 
 public class Paywall {
 
-    private final ProductHelper productYear = ProductHelper.of(
+    private final ProductCurrency productYear = ProductCurrency.of(
             0,
             999_999,
             "VND",
             BillingPeriod.YEAR
     );
-    private final ProductHelper productQuarter = ProductHelper.of(
+    private final ProductCurrency productQuarter = ProductCurrency.of(
             0,
             222_222,
             "VND",
             BillingPeriod.QUARTER
     );
-    private final ProductHelper productMonth = ProductHelper.of(
+    private final ProductCurrency productMonth = ProductCurrency.of(
             0,
             66_666,
             "VND",
@@ -99,9 +99,6 @@ public class Paywall {
                             showToast("Click card_month!");
                         }))
                 .bindDismiss(R.id.btn_close).and()
-                .bindClaim(R.id.btn_claim).setOnClaimListener((view, params) -> {
-                    showToast("Click claim!");
-                }).and()
                 .bindStatusBar(bar -> bar
                         .backgroundTransparent()
                         .darkAppearance())

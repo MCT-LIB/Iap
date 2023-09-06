@@ -2,6 +2,7 @@ package com.mct.iap.banner.component;
 
 import android.view.View;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
 import com.mct.iap.banner.IapBanner;
@@ -22,6 +23,7 @@ public abstract class BaseComponentAdapter implements BaseComponent {
     /**
      * {@inheritDoc}
      */
+    @CallSuper
     @Override
     public void init(@NonNull IapBanner banner, View root) {
     }
@@ -29,6 +31,7 @@ public abstract class BaseComponentAdapter implements BaseComponent {
     /**
      * {@inheritDoc}
      */
+    @CallSuper
     @Override
     public void release(@NonNull IapBanner banner, View root) {
     }

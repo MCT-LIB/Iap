@@ -1,4 +1,4 @@
-package com.mct.iap.billing;
+package com.mct.iap.banner.utils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

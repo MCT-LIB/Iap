@@ -1,4 +1,4 @@
-package com.mct.iap.billing;
+package com.mct.iap.banner.utils;
 
 import android.content.Context;
 
@@ -7,12 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.android.billingclient.api.ProductDetails;
-import com.mct.iap.utils.TimeCurrencyUtils;
 
-public class ProductHelper {
+public class ProductCurrency {
 
     @NonNull
-    public static ProductHelper of(float salePercent, @NonNull ProductDetails.PricingPhase pricingPhase) {
+    public static ProductCurrency of(float salePercent, @NonNull ProductDetails.PricingPhase pricingPhase) {
         return of(salePercent,
                 pricingPhase.getPriceAmountMicros() / 1000000f,
                 pricingPhase.getPriceCurrencyCode(),
@@ -20,18 +19,18 @@ public class ProductHelper {
     }
 
     @NonNull
-    public static ProductHelper of(float salePercent, float priceAmount, String priceCurrencyCode) {
+    public static ProductCurrency of(float salePercent, float priceAmount, String priceCurrencyCode) {
         return of(salePercent, priceAmount, priceCurrencyCode, "");
     }
 
     @NonNull
-    public static ProductHelper of(float salePercent, float priceAmount, String priceCurrencyCode, String billingPeriod) {
+    public static ProductCurrency of(float salePercent, float priceAmount, String priceCurrencyCode, String billingPeriod) {
         return of(salePercent, priceAmount, priceCurrencyCode, BillingPeriod.findPeriod(billingPeriod));
     }
 
     @NonNull
-    public static ProductHelper of(float salePercent, float priceAmount, String priceCurrencyCode, BillingPeriod billingPeriod) {
-        return new ProductHelper(salePercent, priceAmount, priceCurrencyCode, billingPeriod);
+    public static ProductCurrency of(float salePercent, float priceAmount, String priceCurrencyCode, BillingPeriod billingPeriod) {
+        return new ProductCurrency(salePercent, priceAmount, priceCurrencyCode, billingPeriod);
     }
 
     public final float discountPercent;
@@ -39,7 +38,7 @@ public class ProductHelper {
     public final String priceCurrencyCode;
     public final BillingPeriod billingPeriod;
 
-    ProductHelper(float discountPercent, float priceAmount, String priceCurrencyCode, @NonNull BillingPeriod billingPeriod) {
+    ProductCurrency(float discountPercent, float priceAmount, String priceCurrencyCode, @NonNull BillingPeriod billingPeriod) {
         this.discountPercent = discountPercent;
         this.priceAmount = priceAmount;
         this.priceCurrencyCode = priceCurrencyCode;
@@ -86,7 +85,7 @@ public class ProductHelper {
     }
 
     public String getFormattedPrice(float price) {
-        return TimeCurrencyUtils.formatMoney(price, priceCurrencyCode);
+        return FormatUtils.formatMoney(price, priceCurrencyCode);
     }
 
     public String getPeriodTitle(@NonNull Context context) {

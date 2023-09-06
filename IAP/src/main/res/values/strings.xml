@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="n_per_period">%s/%s</string>
-    <string name="only_n_per_period">Only %s/%s</string>
-
     <string name="period_day">day</string>
     <string name="period_week">week</string>
     <string name="period_month">month</string>

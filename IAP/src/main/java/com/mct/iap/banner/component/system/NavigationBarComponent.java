@@ -8,6 +8,8 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
+import com.mct.iap.R;
+
 /**
  * NavigationBarComponent - A component for customizing the navigation bar of an IapBanner.
  * <p>
@@ -37,7 +39,7 @@ public class NavigationBarComponent extends SystemBarComponent<NavigationBarComp
     /**
      * The ID for the navigation bar component.
      */
-    public static final int ID = android.R.id.navigationBarBackground;
+    public static final int ID = R.id.iap_component_sys_bar_nav;
 
     public NavigationBarComponent() {
     }

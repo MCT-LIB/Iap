@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.mct.iap.banner.IapBanner;
 import com.mct.iap.banner.countdown.Countdown;
-import com.mct.iap.utils.TimeCurrencyUtils;
+import com.mct.iap.banner.utils.FormatUtils;
 
 /**
  * TimeComponent - A component for displaying countdown time within an IapBanner.
@@ -74,9 +74,6 @@ public class TimeComponent<C extends TimeComponent<C>> extends TextComponent<C>
      */
     @Override
     public void onCountDown(int hour, int minute, int second) {
-        if (style == TimeStyle.UNSET) {
-            return;
-        }
         int time;
         switch (style) {
             case TimeStyle.HOUR:
@@ -88,10 +85,12 @@ public class TimeComponent<C extends TimeComponent<C>> extends TextComponent<C>
             case TimeStyle.SECOND:
                 time = second;
                 break;
+            case TimeStyle.MILLISECOND:
+            case TimeStyle.UNSET:
             default:
                 return;
         }
-        text(TimeCurrencyUtils.formatTime(time)).setText();
+        text(FormatUtils.formatTime(time)).setText();
     }
 
     /**
@@ -101,7 +100,14 @@ public class TimeComponent<C extends TimeComponent<C>> extends TextComponent<C>
      */
     @Override
     public void onCountDown(int mill) {
-        text(TimeCurrencyUtils.formatTime(mill)).setText();
+        text(FormatUtils.formatTime(mill)).setText();
+    }
+
+    /**
+     * @return style of time component
+     */
+    public int getStyle() {
+        return style;
     }
 
     /**

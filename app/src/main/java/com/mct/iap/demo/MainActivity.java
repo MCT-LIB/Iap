@@ -8,12 +8,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Pair;
 
 import com.mct.iap.banner.IapBannerBuilder;
-import com.mct.iap.billing.BillingPeriod;
-import com.mct.iap.billing.ProductHelper;
+import com.mct.iap.banner.utils.BillingPeriod;
+import com.mct.iap.banner.utils.ProductCurrency;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final ProductHelper product = ProductHelper.of(
+    private final ProductCurrency product = ProductCurrency.of(
             80,
             750_000,
             "VND",
@@ -29,6 +29,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.banner_medium).setOnClickListener(v -> showBannerMedium());
         findViewById(R.id.banner_large).setOnClickListener(v -> showBannerLarge());
         findViewById(R.id.pay_wall).setOnClickListener(v -> showPaywall());
+
+        /*/
+        getSupportFragmentManager().beginTransaction()
+                .add(Window.ID_ANDROID_CONTENT, new MainFragment(), null)
+                .addToBackStack(null)
+                .commit();
+        /*/
     }
 
     private void showBannerCountdown() {
@@ -59,9 +66,7 @@ public class MainActivity extends AppCompatActivity {
                         .text(money_fake)
                         .highlightText(product.getFakePrice())
                         .strikeThru())
-                .bindDismiss(R.id.btn_close)
-                .and()
-                .bindClaim(R.id.btn_claim).setOnClaimListener((view, params) -> showToast("Click claim!"))
+                .bindDismiss(R.id.btn_close).and()
                 .show(false);
     }
 
@@ -86,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 .bindView(R.id.tv_restore_purchase).setClickListener(v -> showToast("click tv_restore_purchase")).and()
                 .bindView(R.id.tv_terms_of_use).setClickListener(v -> showToast("click tv_terms_of_use")).and()
                 .bindDismiss(R.id.btn_close).and()
-                .bindClaim(R.id.btn_claim).setOnClaimListener((view, params) -> showToast("Click claim!"))
                 .show(true);
     }
 

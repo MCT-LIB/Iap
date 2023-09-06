@@ -6,8 +6,6 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.mct.iap.utils.TimeCurrencyUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,12 +90,14 @@ public class Countdown {
     private Countdown() {
         handler = new Handler(Looper.getMainLooper());
         countDownRunnable = new Runnable() {
+            static final int ONE_SECOND = 1000;
+
             @Override
             public void run() {
                 if (!isCountDown) {
                     return;
                 }
-                if ((time -= TimeCurrencyUtils.ONE_SECOND) <= 0) {
+                if ((time -= ONE_SECOND) <= 0) {
                     time = 0;
                 }
                 notifyTimeChanged();
@@ -105,7 +105,7 @@ public class Countdown {
                     stopCountDown();
                     return;
                 }
-                handler.postDelayed(this, TimeCurrencyUtils.ONE_SECOND);
+                handler.postDelayed(this, ONE_SECOND);
             }
         };
     }
@@ -260,7 +260,7 @@ public class Countdown {
         if (countDownListeners == null) {
             return;
         }
-        int[] times = TimeCurrencyUtils.splitTime(time);
+        int[] times = splitTime(time);
         for (CountDownListener listener : countDownListeners) {
             listener.onCountDown(times[0], times[1], times[2]);
         }
@@ -308,6 +308,15 @@ public class Countdown {
             };
         }
         return milliHandler;
+    }
+
+    @NonNull
+    private int[] splitTime(long time) {
+        int hours = (int) (time / 3_600_000);
+        int minutes = (int) ((time % 3_600_000) / 60_000);
+        int seconds = (int) (((time % 3_600_000) % 60_000) / 1_000);
+
+        return new int[]{hours, minutes, seconds};
     }
 
     /**
