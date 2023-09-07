@@ -1,5 +1,7 @@
 package com.mct.iap.billing.models;
 
+import androidx.annotation.NonNull;
+
 import com.android.billingclient.api.ProductDetails;
 
 import java.util.ArrayList;
@@ -49,9 +51,22 @@ public class SubscriptionOfferDetails {
         return pricingPhases;
     }
 
-    private PricingPhases createPricingPhase(ProductDetails.PricingPhase pricingPhase) {
+    @NonNull
+    private PricingPhases createPricingPhase(@NonNull ProductDetails.PricingPhase pricingPhase) {
         return new PricingPhases(pricingPhase.getFormattedPrice(), pricingPhase.getPriceAmountMicros(), pricingPhase.getPriceCurrencyCode(),
                 pricingPhase.getBillingPeriod(), pricingPhase.getBillingCycleCount(), pricingPhase.getRecurrenceMode());
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "SubscriptionOfferDetails{" +
+                "offerId='" + offerId + '\'' +
+                ", offerTags=" + offerTags +
+                ", offerToken='" + offerToken + '\'' +
+                ", basePlanId='" + basePlanId + '\'' +
+                ", pricingPhases=" + pricingPhases +
+                '}';
     }
 
     public static class PricingPhases {
@@ -94,6 +109,19 @@ public class SubscriptionOfferDetails {
 
         public int getRecurrenceMode() {
             return recurrenceMode;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "PricingPhases{" +
+                    "formattedPrice='" + formattedPrice + '\'' +
+                    ", priceAmountMicros=" + priceAmountMicros +
+                    ", priceCurrencyCode='" + priceCurrencyCode + '\'' +
+                    ", billingPeriod='" + billingPeriod + '\'' +
+                    ", billingCycleCount=" + billingCycleCount +
+                    ", recurrenceMode=" + recurrenceMode +
+                    '}';
         }
     }
 }

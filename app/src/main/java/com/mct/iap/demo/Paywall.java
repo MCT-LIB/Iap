@@ -14,24 +14,24 @@ import com.mct.iap.banner.IapBanner;
 import com.mct.iap.banner.IapBannerBuilder;
 import com.mct.iap.banner.component.normal.Component;
 import com.mct.iap.banner.component.normal.CompositeComponent;
-import com.mct.iap.banner.utils.BillingPeriod;
-import com.mct.iap.banner.utils.ProductCurrency;
+import com.mct.iap.banner.component.billing.BillingPeriod;
+import com.mct.iap.banner.component.billing.ProductPriceInfo;
 
 public class Paywall {
 
-    private final ProductCurrency productYear = ProductCurrency.of(
+    private final ProductPriceInfo productYear = ProductPriceInfo.fromPriceAmount(
             0,
             999_999,
             "VND",
             BillingPeriod.YEAR
     );
-    private final ProductCurrency productQuarter = ProductCurrency.of(
+    private final ProductPriceInfo productQuarter = ProductPriceInfo.fromPriceAmount(
             0,
             222_222,
             "VND",
             BillingPeriod.QUARTER
     );
-    private final ProductCurrency productMonth = ProductCurrency.of(
+    private final ProductPriceInfo productMonth = ProductPriceInfo.fromPriceAmount(
             0,
             66_666,
             "VND",

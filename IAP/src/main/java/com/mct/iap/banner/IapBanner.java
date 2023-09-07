@@ -48,6 +48,16 @@ public class IapBanner implements View.OnAttachStateChangeListener {
         this.bannerDismissListener = builder.onBannerDismissListener;
     }
 
+    @Override
+    public void onViewAttachedToWindow(@NonNull View v) {
+        countdown.startCountDown();
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull View v) {
+        countdown.stopCountDown();
+    }
+
     /**
      * Initialize the banner. This method should be called before displaying the banner.
      * It inflates the banner layout, initializes components, and sets up countdown timers.
@@ -139,12 +149,23 @@ public class IapBanner implements View.OnAttachStateChangeListener {
         return (T) components.get(id);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Area Dialog
+    ///////////////////////////////////////////////////////////////////////////
+
+    public boolean isShowing() {
+        return dialog != null && dialog.isShowing();
+    }
+
     /**
      * Show the banner with the option to make it full-screen.
      *
      * @param fullScreen Set to true to display the banner as full-screen.
      */
     public void show(boolean fullScreen) {
+        if (isShowing()) {
+            return;
+        }
         init();
         if (dialog == null) {
             dialog = new IapBannerDialog(this, fullScreen);
@@ -167,21 +188,14 @@ public class IapBanner implements View.OnAttachStateChangeListener {
      * Dismiss the banner and release associated resources.
      */
     public void dismiss() {
+        if (!isShowing()) {
+            return;
+        }
         release();
         if (dialog != null) {
             dialog.dismiss();
             dialog = null;
         }
-    }
-
-    @Override
-    public void onViewAttachedToWindow(@NonNull View v) {
-        countdown.startCountDown();
-    }
-
-    @Override
-    public void onViewDetachedFromWindow(@NonNull View v) {
-        countdown.stopCountDown();
     }
 
 }

@@ -94,4 +94,22 @@ public class ProductInfo {
     private SubscriptionOfferDetails createSubscriptionOfferDetails(@NonNull ProductDetails.SubscriptionOfferDetails offerDetails) {
         return new SubscriptionOfferDetails(offerDetails.getOfferId(), offerDetails.getPricingPhases().getPricingPhaseList(), offerDetails.getOfferTags(), offerDetails.getOfferToken(), offerDetails.getBasePlanId());
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "ProductInfo{" +
+                "skuProductType=" + skuProductType +
+                ", productDetails=" + productDetails +
+                ", product='" + product + '\'' +
+                ", description='" + description + '\'' +
+                ", title='" + title + '\'' +
+                ", type='" + type + '\'' +
+                ", name='" + name + '\'' +
+                ", oneTimePurchaseOfferFormattedPrice='" + oneTimePurchaseOfferFormattedPrice + '\'' +
+                ", oneTimePurchaseOfferPriceAmountMicros=" + oneTimePurchaseOfferPriceAmountMicros +
+                ", oneTimePurchaseOfferPriceCurrencyCode='" + oneTimePurchaseOfferPriceCurrencyCode + '\'' +
+                ", subscriptionOfferDetails=" + subscriptionOfferDetails +
+                '}';
+    }
 }

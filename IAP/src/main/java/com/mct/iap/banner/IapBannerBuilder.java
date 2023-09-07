@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.mct.iap.banner.component.BaseComponent;
 import com.mct.iap.banner.component.BaseComponentAdapter;
 import com.mct.iap.banner.component.billing.BillingComponent;
+import com.mct.iap.banner.component.billing.ProductConfiguration;
 import com.mct.iap.banner.component.normal.ClaimComponent;
 import com.mct.iap.banner.component.normal.Component;
 import com.mct.iap.banner.component.normal.CompositeComponent;
@@ -144,18 +145,6 @@ public class IapBannerBuilder {
     }
 
     /**
-     * Bind a LazyText component and apply customizations using a Customizer.
-     *
-     * @param id         The resource ID of the TextView.
-     * @param customizer The Customizer for configuring the component.
-     * @return The builder instance for method chaining.
-     */
-    public IapBannerBuilder bindLazyText(@IdRes int id, @NonNull Customizer<LazyTextComponent<?>> customizer) {
-        customizer.customize(bindLazyText(id));
-        return this;
-    }
-
-    /**
      * Bind a Dismiss component and apply customizations using a Customizer.
      *
      * @param id         The resource ID of the View.
@@ -170,12 +159,26 @@ public class IapBannerBuilder {
     /**
      * Bind a Claim component and apply customizations using a Customizer.
      *
-     * @param id         The resource ID of the View.
-     * @param customizer The Customizer for configuring the component.
+     * @param id            The resource ID of the View.
+     * @param configuration The configuration.
+     * @param customizer    The Customizer for configuring the component.
      * @return The builder instance for method chaining.
      */
-    public IapBannerBuilder bindClaim(@IdRes int id, @NonNull Customizer<ClaimComponent<?>> customizer) {
-        customizer.customize(bindClaim(id));
+    public IapBannerBuilder bindClaim(@IdRes int id, ProductConfiguration configuration, @NonNull Customizer<ClaimComponent<?>> customizer) {
+        customizer.customize(bindClaim(id, configuration));
+        return this;
+    }
+
+    /**
+     * Bind a LazyText component and apply customizations using a Customizer.
+     *
+     * @param id            The resource ID of the TextView.
+     * @param configuration The configuration.
+     * @param customizer    The Customizer for configuring the component.
+     * @return The builder instance for method chaining.
+     */
+    public IapBannerBuilder bindLazyText(@IdRes int id, ProductConfiguration configuration, @NonNull Customizer<LazyTextComponent<?>> customizer) {
+        customizer.customize(bindLazyText(id, configuration));
         return this;
     }
 
@@ -275,16 +278,6 @@ public class IapBannerBuilder {
     }
 
     /**
-     * Bind a LazyText component.
-     *
-     * @param id The resource ID of the TextView.
-     * @return A LazyTextComponent instance bound to the specified view.
-     */
-    public LazyTextComponent<?> bindLazyText(@IdRes int id) {
-        return bindComponent(id, new LazyTextComponent<>(id));
-    }
-
-    /**
      * Bind a Dismiss component.
      *
      * @param id The resource ID of the View.
@@ -297,11 +290,23 @@ public class IapBannerBuilder {
     /**
      * Bind a Claim component.
      *
-     * @param id The resource ID of the View.
+     * @param id            The resource ID of the View.
+     * @param configuration The configuration.
      * @return A ClaimComponent instance bound to the specified view.
      */
-    public ClaimComponent<?> bindClaim(@IdRes int id) {
-        return bindComponent(id, new ClaimComponent<>(id));
+    public ClaimComponent<?> bindClaim(@IdRes int id, ProductConfiguration configuration) {
+        return bindComponent(id, new ClaimComponent<>(id)).setProductConfiguration(configuration);
+    }
+
+    /**
+     * Bind a LazyText component.
+     *
+     * @param id            The resource ID of the TextView.
+     * @param configuration The configuration.
+     * @return A LazyTextComponent instance bound to the specified view.
+     */
+    public LazyTextComponent<?> bindLazyText(@IdRes int id, ProductConfiguration configuration) {
+        return bindComponent(id, new LazyTextComponent<>(id)).setProductConfiguration(configuration);
     }
 
     /**

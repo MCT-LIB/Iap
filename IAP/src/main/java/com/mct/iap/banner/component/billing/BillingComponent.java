@@ -18,7 +18,11 @@ import com.mct.iap.billing.models.ProductInfo;
 import com.mct.iap.billing.models.PurchaseInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * BillingComponent manages in-app purchase functionality for fetching product
@@ -59,11 +63,11 @@ public class BillingComponent extends BaseComponentAdapter {
 
     private final Activity activity;
     private final BillingConnector connector;
-    private final List<BillingEventListener> listeners;
+    private final List<BillingEventListeners> listeners;
 
-    private final List<String> consumableIds = new ArrayList<>();
-    private final List<String> nonConsumableIds = new ArrayList<>();
-    private final List<String> subscriptionIds = new ArrayList<>();
+    private final Set<ProductConfiguration> consumableStrategies = new HashSet<>();
+    private final Set<ProductConfiguration> nonConsumableStrategies = new HashSet<>();
+    private final Set<ProductConfiguration> subscriptionStrategies = new HashSet<>();
 
     /**
      * BillingComponent public constructor
@@ -95,53 +99,11 @@ public class BillingComponent extends BaseComponentAdapter {
     @Override
     public void init(@NonNull IapBanner banner, View root) {
         super.init(banner, root);
-        connector.setConsumableIds(consumableIds);
-        connector.setNonConsumableIds(nonConsumableIds);
-        connector.setSubscriptionIds(subscriptionIds);
+        connector.setConsumableIds(consumableStrategies.stream().map(ProductConfiguration::getProductId).collect(Collectors.toList()));
+        connector.setNonConsumableIds(nonConsumableStrategies.stream().map(ProductConfiguration::getProductId).collect(Collectors.toList()));
+        connector.setSubscriptionIds(subscriptionStrategies.stream().map(ProductConfiguration::getProductId).collect(Collectors.toList()));
+        connector.setBillingEventListener(new BillingEvent(banner, listeners));
         connector.connect();
-        connector.setBillingEventListener(new BillingEventListener() {
-            @Override
-            public void onProductsFetched(@NonNull List<ProductInfo> productDetails) {
-                for (BillingEventListener listener : listeners) {
-                    listener.onProductsFetched(productDetails);
-                }
-            }
-
-            @Override
-            public void onPurchasedProductsFetched(@NonNull ProductType productType, @NonNull List<PurchaseInfo> purchases) {
-                for (BillingEventListener listener : listeners) {
-                    listener.onPurchasedProductsFetched(productType, purchases);
-                }
-            }
-
-            @Override
-            public void onProductsPurchased(@NonNull List<PurchaseInfo> purchases) {
-                for (BillingEventListener listener : listeners) {
-                    listener.onProductsPurchased(purchases);
-                }
-            }
-
-            @Override
-            public void onPurchaseAcknowledged(@NonNull PurchaseInfo purchase) {
-                for (BillingEventListener listener : listeners) {
-                    listener.onPurchaseAcknowledged(purchase);
-                }
-            }
-
-            @Override
-            public void onPurchaseConsumed(@NonNull PurchaseInfo purchase) {
-                for (BillingEventListener listener : listeners) {
-                    listener.onPurchaseConsumed(purchase);
-                }
-            }
-
-            @Override
-            public void onBillingError(@NonNull BillingConnector billingConnector, @NonNull BillingResponse response) {
-                for (BillingEventListener listener : listeners) {
-                    listener.onBillingError(billingConnector, response);
-                }
-            }
-        });
     }
 
     /**
@@ -157,66 +119,33 @@ public class BillingComponent extends BaseComponentAdapter {
     /**
      * Adds a consumable product ID to fetch listings for.
      *
-     * @param consumableId - The consumable product ID to be added.
+     * @param consumable - The consumable products ID to be added.
      * @return The {@link BillingComponent} instance for method chaining.
      */
-    public BillingComponent addConsumableIds(String consumableId) {
-        add(consumableIds, consumableId);
+    public BillingComponent addConsumable(ProductConfiguration... consumable) {
+        add(this.consumableStrategies, consumable);
         return this;
     }
 
     /**
      * Adds a non-consumable product ID to fetch listings for.
      *
-     * @param nonConsumableId - The non-consumable product ID to be added.
+     * @param nonConsumable - The non-consumable product ID to be added.
      * @return The {@link BillingComponent} instance for method chaining.
      */
-    public BillingComponent addNonConsumableIds(String nonConsumableId) {
-        add(nonConsumableIds, nonConsumableId);
+    public BillingComponent addNonConsumable(ProductConfiguration... nonConsumable) {
+        add(this.nonConsumableStrategies, nonConsumable);
         return this;
     }
 
     /**
      * Adds a subscription product ID to fetch listings for.
      *
-     * @param subscriptionId - The subscription product ID to be added.
+     * @param subscription - The subscription product ID to be added.
      * @return The {@link BillingComponent} instance for method chaining.
      */
-    public BillingComponent addSubscriptionIds(String subscriptionId) {
-        add(subscriptionIds, subscriptionId);
-        return this;
-    }
-
-    /**
-     * Set consumable products ID to fetch listings for.
-     *
-     * @param consumableIds - A list of consumable product IDs to be set.
-     * @return The {@link BillingComponent} instance for method chaining.
-     */
-    public BillingComponent setConsumableIds(List<String> consumableIds) {
-        set(this.consumableIds, consumableIds);
-        return this;
-    }
-
-    /**
-     * Set non-consumable products ID to fetch listings for.
-     *
-     * @param nonConsumableIds - A list of non-consumable product IDs to be set.
-     * @return The {@link BillingComponent} instance for method chaining.
-     */
-    public BillingComponent setNonConsumableIds(List<String> nonConsumableIds) {
-        set(this.nonConsumableIds, nonConsumableIds);
-        return this;
-    }
-
-    /**
-     * Set subscription products ID to fetch listings for.
-     *
-     * @param subscriptionIds - A list of subscription product IDs to be set.
-     * @return The {@link BillingComponent} instance for method chaining.
-     */
-    public BillingComponent setSubscriptionIds(List<String> subscriptionIds) {
-        set(this.subscriptionIds, subscriptionIds);
+    public BillingComponent addSubscription(ProductConfiguration... subscription) {
+        add(this.subscriptionStrategies, subscription);
         return this;
     }
 
@@ -256,7 +185,7 @@ public class BillingComponent extends BaseComponentAdapter {
      * @param listener - The BillingEventListener to be added.
      * @return The {@link BillingComponent} instance for method chaining.
      */
-    public BillingComponent addBillingEventListener(BillingEventListener listener) {
+    public BillingComponent addBillingEventListener(BillingEventListeners listener) {
         if (listener == null) {
             return this;
         }
@@ -272,7 +201,7 @@ public class BillingComponent extends BaseComponentAdapter {
      * @param listener - The BillingEventListener to be removed.
      * @return The {@link BillingComponent} instance for method chaining.
      */
-    public BillingComponent removeBillingEventListener(BillingEventListener listener) {
+    public BillingComponent removeBillingEventListener(BillingEventListeners listener) {
         if (listener == null) {
             return this;
         }
@@ -283,20 +212,10 @@ public class BillingComponent extends BaseComponentAdapter {
     /**
      * Subscribes to a subscription product.
      *
-     * @param productId - The ID of the subscription product to subscribe to.
+     * @param product - The product to subscribe.
      */
-    public final void subscribe(String productId) {
-        subscribe(productId, 0);
-    }
-
-    /**
-     * Subscribes to a subscription product with a selected offer index.
-     *
-     * @param productId          - The ID of the subscription product to subscribe to.
-     * @param selectedOfferIndex - The index of the selected offer for the subscription.
-     */
-    public final void subscribe(String productId, int selectedOfferIndex) {
-        connector.subscribe(activity, productId, selectedOfferIndex);
+    public final void subscribe(@NonNull ProductConfiguration product) {
+        connector.subscribe(activity, product.getProductId(), product.getSelectedOfferIndex());
     }
 
     /**
@@ -336,28 +255,85 @@ public class BillingComponent extends BaseComponentAdapter {
         return connector.isPurchased(productInfo);
     }
 
+    public List<ProductConfiguration> getConsumableStrategies() {
+        return new ArrayList<>(consumableStrategies);
+    }
+
+    public List<ProductConfiguration> getNonConsumableStrategies() {
+        return new ArrayList<>(nonConsumableStrategies);
+    }
+
+    public List<ProductConfiguration> getSubscriptionStrategies() {
+        return new ArrayList<>(subscriptionStrategies);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
-    // Helper methods
+    // Helper class & methods
     ///////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Adds a String data to a List.
-     *
-     * @param list - The List to which the data is added.
-     * @param data - The String data to be added.
-     */
-    private void add(@NonNull List<String> list, String data) {
-        list.add(data);
+    private static class BillingEvent implements BillingEventListener {
+
+        private final IapBanner banner;
+        private final List<BillingEventListeners> listeners;
+
+        private BillingEvent(IapBanner banner, List<BillingEventListeners> listeners) {
+            this.banner = banner;
+            this.listeners = listeners;
+        }
+
+        @Override
+        public void onProductsFetched(@NonNull List<ProductInfo> productDetails) {
+            for (BillingEventListeners listener : listeners) {
+                listener.onProductsFetched(banner, productDetails);
+            }
+        }
+
+        @Override
+        public void onPurchasedProductsFetched(@NonNull ProductType productType, @NonNull List<PurchaseInfo> purchases) {
+            for (BillingEventListeners listener : listeners) {
+                listener.onPurchasedProductsFetched(banner, productType, purchases);
+            }
+        }
+
+        @Override
+        public void onProductsPurchased(@NonNull List<PurchaseInfo> purchases) {
+            for (BillingEventListeners listener : listeners) {
+                listener.onProductsPurchased(banner, purchases);
+            }
+        }
+
+        @Override
+        public void onPurchaseAcknowledged(@NonNull PurchaseInfo purchase) {
+            for (BillingEventListeners listener : listeners) {
+                listener.onPurchaseAcknowledged(banner, purchase);
+            }
+        }
+
+        @Override
+        public void onPurchaseConsumed(@NonNull PurchaseInfo purchase) {
+            for (BillingEventListeners listener : listeners) {
+                listener.onPurchaseConsumed(banner, purchase);
+            }
+        }
+
+        @Override
+        public void onBillingError(@NonNull BillingConnector billingConnector, @NonNull BillingResponse response) {
+            for (BillingEventListeners listener : listeners) {
+                listener.onBillingError(banner, billingConnector, response);
+            }
+        }
     }
 
     /**
-     * Sets a List of String data.
+     * Adds a String ids to a List.
      *
-     * @param list - The List to be set.
-     * @param data - The List of String data to set.
+     * @param list - The List to which the ids is added.
+     * @param ids  - The String ids to be added.
      */
-    private void set(@NonNull List<String> list, List<String> data) {
-        list.clear();
-        list.addAll(data);
+    private void add(@NonNull Set<ProductConfiguration> list, ProductConfiguration... ids) {
+        if (ids != null) {
+            list.addAll(Arrays.asList(ids));
+        }
     }
+
 }

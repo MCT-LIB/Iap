@@ -6,7 +6,9 @@ import androidx.annotation.NonNull;
 
 import com.mct.iap.banner.IapBanner;
 import com.mct.iap.banner.component.billing.BillingComponent;
-import com.mct.iap.banner.component.billing.BillingEventListenerAdapter;
+import com.mct.iap.banner.component.billing.BillingEventListeners;
+import com.mct.iap.banner.component.billing.ProductConfiguration;
+import com.mct.iap.banner.component.billing.ProductPriceInfo;
 import com.mct.iap.billing.models.ProductInfo;
 
 import java.util.List;
@@ -42,28 +44,33 @@ import java.util.Objects;
  */
 public class LazyTextComponent<C extends LazyTextComponent<C>> extends TextComponent<C> {
 
-    private String productId;
+    private ProductConfiguration productConfiguration;
     private LazyLoadText lazyLoadText;
     private LazyLoadText lazyLoadHighlightText;
 
-    private final BillingEventListenerAdapter listenerAdapter = new BillingEventListenerAdapter() {
+    private final BillingEventListeners listenerAdapter = new BillingEventListeners() {
         @Override
-        public void onProductsFetched(@NonNull List<ProductInfo> productInfos) {
+        public void onProductsFetched(@NonNull IapBanner banner, @NonNull List<ProductInfo> productInfos) {
+            // product is null -> ignore
+            if (productConfiguration == null) {
+                return;
+            }
             // Callback triggered when product information is fetched
             // Load text and highlight text based on productInfo
             // Update the component's text if it has changed
             ProductInfo productInfo = productInfos.stream()
-                    .filter(p -> Objects.equals(p.getProduct(), productId))
+                    .filter(p -> Objects.equals(p.getProduct(), productConfiguration.getProductId()))
                     .findFirst()
                     .orElse(null);
             if (productInfo != null) {
                 String text = null;
                 String highlightText = null;
+                ProductPriceInfo productPriceInfo = ProductPriceInfo.fromProductInfo(productConfiguration, productInfo);
                 if (lazyLoadText != null) {
-                    text = lazyLoadText.lazy(productInfo);
+                    text = lazyLoadText.lazy(productInfo, productPriceInfo);
                 }
                 if (lazyLoadHighlightText != null) {
-                    highlightText = lazyLoadHighlightText.lazy(productInfo);
+                    highlightText = lazyLoadHighlightText.lazy(productInfo, productPriceInfo);
                 }
                 if (!Objects.equals(getText(), text) || !Objects.equals(getHighlightText(), highlightText)) {
                     text(text).highlightText(highlightText).setText();
@@ -106,19 +113,19 @@ public class LazyTextComponent<C extends LazyTextComponent<C>> extends TextCompo
     /**
      * Sets the product ID for which the text will be loaded lazily.
      *
-     * @param productId - The product ID to set.
+     * @param productConfiguration - The product configuration to set.
      * @return The {@link LazyTextComponent} instance for method chaining.
      */
     @SuppressWarnings("unchecked")
-    public C setProductId(String productId) {
-        this.productId = productId;
+    public C setProductConfiguration(ProductConfiguration productConfiguration) {
+        this.productConfiguration = productConfiguration;
         return (C) this;
     }
 
     /**
      * Sets a lazy text loader to load text based on product information.
      *
-     * @param lazyLoadText - The `LazyLoadText` instance to load text.
+     * @param lazyLoadText - The {@link LazyLoadText} instance to load text.
      * @return The {@link LazyTextComponent} instance for method chaining.
      */
     @SuppressWarnings("unchecked")
@@ -130,7 +137,7 @@ public class LazyTextComponent<C extends LazyTextComponent<C>> extends TextCompo
     /**
      * Sets a lazy highlight text loader to load highlight text based on product information.
      *
-     * @param lazyLoadHighlightText - The `LazyLoadText` instance to load highlight text.
+     * @param lazyLoadHighlightText - The {@link LazyLoadText} instance to load highlight text.
      * @return The {@link LazyTextComponent} instance for method chaining.
      */
     @SuppressWarnings("unchecked")
@@ -143,6 +150,6 @@ public class LazyTextComponent<C extends LazyTextComponent<C>> extends TextCompo
      * A callback interface to load text based on product information.
      */
     public interface LazyLoadText {
-        String lazy(ProductInfo productInfo);
+        String lazy(ProductInfo productInfo, ProductPriceInfo productPriceInfo);
     }
 }
