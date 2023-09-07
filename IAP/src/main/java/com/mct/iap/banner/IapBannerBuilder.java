@@ -36,38 +36,65 @@ import java.util.Map;
  * Usage example:
  * <code>
  * <pre>
- *     new IapBannerBuilder(this, R.layout.your_layout)
- *          .bindViewGroup(R.id.card_year, cc -> cc
- *                  .bindView(R.id.card_radio_button, Customizer.withDefaults())
- *                  .bindText(R.id.card_title, tv -> tv.text("Yearly"))
- *                  .bindText(R.id.card_price, tv -> tv.text(priceYear).underline().highlight(Color.RED))
- *                  .setClickListener(v -> {}))
- *          .bindText(R.id.tv_money_real, component -> component
- *                  .text(realMoney)
- *                  .bold())
- *          .bindText(R.id.tv_money_fake, component -> component
- *                  .text(fakeMoney)
- *                  .strikeThru())
- *          .bindText(R.id.tv_money_avg).text(avgMoney).and()
- *          .bindTime(R.id.tv_hour, TimeComponent::hour)
- *          .bindTime(R.id.tv_minute, TimeComponent::minute)
- *          .bindTime(R.id.tv_second).second().highlight(Color.RED).and()
- *          .bindTime(R.id.tv_millisecond, component -> component
- *                  .millisecond()
- *                  .underline()
- *                  .bold())
- *          .bindDismiss(R.id.btn_close, Customizer.withDefaults())
- *          .bindClaim(R.id.btn_claim).setOnClaimListener((view, params) -> {})
- *          .bindStatusBar(bar-> bar
- *                  .background(Color.parseColor("#000000"))
- *                  .lightAppearance())
- *          .bindNavigationBar(SystemBarComponent::hide)
- *          .setCountDown(3 * 60 * 60 * 1000)
- *          .setOnBannerShowListener((banner, dialog) -> {})
- *          .setOnBannerDismissListener((banner, dialog) -> {})
- *          .show(true);
+ * ProductConfiguration monthConfiguration = ProductConfiguration.of(SUB_MONTH).build();
+ * ProductConfiguration yearConfiguration = ProductConfiguration.of(SUB_YEAR)
+ *         .withDiscountPercent(80)
+ *         .withOfferIndex(0)
+ *         .build();
+ *
+ * new IapBannerBuilder(context, R.layout.your_layout)
+ *         .bindView(R.id.view).and()
+ *         .bindView(R.id.view1, v -> v.setClickListener(listener))
+ *         .bindViewGroup(R.id.view_group, vg -> {
+ *             vg.bindView(id);
+ *             vg.bindText(id);
+ *         })
+ *         .bindText(R.id.text, t -> t.text("").highlightText("").bold().strikeThru().underline().highlight(color))
+ *         .bindTime(R.id.hour, t -> t.hour().bold().underline())
+ *         .bindTime(R.id.minute, t -> t.minute())
+ *         .bindTime(R.id.second, t -> t.second())
+ *         .bindTime(R.id.millisecond, t -> t.millisecond())
+ *         .bindDismiss(R.id.close_btn).and()
+ *         .bindBilling(activity, billing -> billing
+ *                 .addConsumable(consumableConfigurations)
+ *                 .addNonConsumable(nonConsumableConfigurations)
+ *                 .addSubscription(subscriptionConfigurations)
+ *                 .addSubscription(monthConfiguration)
+ *                 .addSubscription(yearConfiguration)
+ *                 .autoConsume()
+ *                 .autoAcknowledge()
+ *                 .addBillingEventListener(new BillingEventListeners() {
+ *                     // override func here
+ *                 }))
+ *         .bindClaim(R.id.claim_month_btn, monthConfiguration).and()
+ *         .bindClaim(R.id.claim_year_btn, yearConfiguration).and()
+ *         .bindLazyText(R.id.text_lazy, monthConfiguration, lzt -> lzt
+ *                 .bold()
+ *                 .strikeThru()
+ *                 .lazyText((productInfo, productPriceInfo) -> {
+ *                     String realPrice = productPriceInfo.getRealPrice();
+ *                     String fakePrice = productPriceInfo.getFakePrice();
+ *                     Pair&lt;BillingPeriod, String&gt; averagePrice = productPriceInfo.getAveragePrice();
+ *                     return realPrice;
+ *                 })
+ *                 .lazyHighlightText((productInfo, productPriceInfo) -> {
+ *                     String realPrice = productPriceInfo.getRealPrice();
+ *                     String fakePrice = productPriceInfo.getFakePrice();
+ *                     Pair&lt;BillingPeriod, String&gt; averagePrice = productPriceInfo.getAveragePrice();
+ *                     return realPrice;
+ *                 }))
+ *         .bindStatusBar(status -> status
+ *                 .background(Color.TRANSPARENT)
+ *                 .lightAppearance()
+ *                 .show())
+ *         .bindNavigationBar(nav -> nav
+ *                 .background(Color.TRANSPARENT)
+ *                 .darkAppearance())
+ *         .show(true);
  * </pre>
  * </code>
+ *
+ * @see IapBanner
  */
 public class IapBannerBuilder {
 
