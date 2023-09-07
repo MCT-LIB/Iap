@@ -63,6 +63,7 @@ new IapBannerBuilder(context, R.layout.your_layout)
             vg.bindText(id);
         })
         .bindText(R.id.text, t -> t.text("").highlightText("").bold().strikeThru().underline().highlight(color))
+        .setCountDownTime(60 * 60 * 1000)
         .bindTime(R.id.hour, t -> t.hour().bold().underline())
         .bindTime(R.id.minute, t -> t.minute())
         .bindTime(R.id.second, t -> t.second())
