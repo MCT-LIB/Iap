@@ -63,11 +63,13 @@ new IapBannerBuilder(context, R.layout.your_layout)
             vg.bindText(id);
         })
         .bindText(R.id.text, t -> t.text("").highlightText("").bold().strikeThru().underline().highlight(color))
+        .setCountDownTime(60 * 60 * 1000)
         .bindTime(R.id.hour, t -> t.hour().bold().underline())
         .bindTime(R.id.minute, t -> t.minute())
         .bindTime(R.id.second, t -> t.second())
         .bindTime(R.id.millisecond, t -> t.millisecond())
         .bindDismiss(R.id.close_btn).and()
+        // for banners with products you want to query
         .bindBilling(activity, billing -> billing
                 .addConsumable(consumableConfigurations)
                 .addNonConsumable(nonConsumableConfigurations)
@@ -96,6 +98,7 @@ new IapBannerBuilder(context, R.layout.your_layout)
                     Pair&lt;BillingPeriod, String&gt; averagePrice = productPriceInfo.getAveragePrice();
                     return realPrice;
                 }))
+        // for dialog
         .bindStatusBar(status -> status
                 .background(Color.TRANSPARENT)
                 .lightAppearance()
@@ -103,6 +106,8 @@ new IapBannerBuilder(context, R.layout.your_layout)
         .bindNavigationBar(nav -> nav
                 .background(Color.TRANSPARENT)
                 .darkAppearance())
+        .setOnBannerShowListener((banner, dialog) -> {})
+        .setOnBannerDismissListener((banner, dialog) -> {})
         .show( /*fullScreen*/ true);
 </pre>
 
