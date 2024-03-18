@@ -3,12 +3,11 @@ package com.mct.iap.banner.component.normal;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Supplier;
 
 import com.mct.iap.banner.IapBanner;
 import com.mct.iap.banner.component.billing.BillingComponent;
 import com.mct.iap.banner.component.billing.ProductConfiguration;
-
-import kotlin.Lazy;
 
 /**
  * ClaimComponent - A component for enabling users to claim an offer within an IapBanner.
@@ -22,7 +21,7 @@ import kotlin.Lazy;
 public class ClaimComponent<C extends ClaimComponent<C>> extends Component<C> {
 
     private ProductConfiguration productConfiguration;
-    private Lazy<ProductConfiguration> productConfigurationLazy;
+    private Supplier<ProductConfiguration> productConfigurationLazy;
 
     /**
      * {@inheritDoc}
@@ -60,7 +59,7 @@ public class ClaimComponent<C extends ClaimComponent<C>> extends Component<C> {
             view.setOnClickListener(v -> {
                 ProductConfiguration configuration = productConfiguration;
                 if (configuration == null && productConfigurationLazy != null) {
-                    configuration = productConfigurationLazy.getValue();
+                    configuration = productConfigurationLazy.get();
                     if (configuration == null) {
                         return;
                     }
@@ -94,7 +93,7 @@ public class ClaimComponent<C extends ClaimComponent<C>> extends Component<C> {
      * @return The {@link ClaimComponent} instance for method chaining.
      */
     @SuppressWarnings("unchecked")
-    public C setProductConfigurationLazy(Lazy<ProductConfiguration> productConfigurationLazy) {
+    public C setProductConfigurationLazy(Supplier<ProductConfiguration> productConfigurationLazy) {
         this.productConfigurationLazy = productConfigurationLazy;
         return (C) this;
     }

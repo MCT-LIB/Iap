@@ -6,6 +6,7 @@ import android.content.Context;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.core.util.Supplier;
 
 import com.mct.iap.banner.component.BaseComponent;
 import com.mct.iap.banner.component.BaseComponentAdapter;
@@ -26,8 +27,6 @@ import com.mct.iap.banner.listener.OnBannerShowListener;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import kotlin.Lazy;
 
 /**
  * Class builder for {@link IapBanner}<br/>
@@ -334,7 +333,7 @@ public class IapBannerBuilder {
      * @param configuration The configuration lazy.
      * @return A ClaimComponent instance bound to the specified view.
      */
-    public ClaimComponent<?> bindClaim(@IdRes int id, Lazy<ProductConfiguration> configuration) {
+    public ClaimComponent<?> bindClaim(@IdRes int id, Supplier<ProductConfiguration> configuration) {
         return bindComponent(id, new ClaimComponent<>(id)).setProductConfigurationLazy(configuration);
     }
 
