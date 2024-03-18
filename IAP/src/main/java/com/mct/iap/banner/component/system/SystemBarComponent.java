@@ -91,10 +91,8 @@ public abstract class SystemBarComponent<C extends SystemBarComponent<C>> extend
      *
      * @return The SystemBarComponent instance to enable method chaining.
      */
-    @SuppressWarnings("unchecked")
     public C lightAppearance() {
-        isLight = false;
-        return (C) this;
+        return appearance(true);
     }
 
     /**
@@ -102,9 +100,19 @@ public abstract class SystemBarComponent<C extends SystemBarComponent<C>> extend
      *
      * @return The SystemBarComponent instance to enable method chaining.
      */
-    @SuppressWarnings("unchecked")
     public C darkAppearance() {
-        isLight = true;
+        return appearance(false);
+    }
+
+    /**
+     * Set the system bar appearance
+     *
+     * @param isLight - true: light appearance, false: dark appearance
+     * @return The SystemBarComponent instance to enable method chaining.
+     */
+    @SuppressWarnings("unchecked")
+    public C appearance(boolean isLight) {
+        this.isLight = !isLight;
         return (C) this;
     }
 
