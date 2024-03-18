@@ -4,11 +4,11 @@ plugins {
 
 android {
     namespace 'com.mct.iap'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 24
-        targetSdk 33
+        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -29,5 +29,5 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.android.billingclient:billing:6.0.1'
+    implementation 'com.android.billingclient:billing:6.2.0'
 }

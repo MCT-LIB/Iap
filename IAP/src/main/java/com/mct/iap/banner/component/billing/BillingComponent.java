@@ -239,10 +239,12 @@ public class BillingComponent extends BaseComponentAdapter {
     /**
      * Unsubscribes from a subscription product.
      *
-     * @param productId - The ID of the subscription product to unsubscribe from.
+     * @param activity    - The activity to use for subscribing.
+     * @param packageName - The package name of the application.
+     * @param productId   - The ID of the subscription product to unsubscribe from.
      */
-    public final void unsubscribe(Activity activity, String productId) {
-        connector.unsubscribe(activity, productId);
+    public final void unsubscribe(Activity activity, String packageName, String productId) {
+        connector.unsubscribe(activity, packageName, productId);
     }
 
     /**

@@ -697,9 +697,9 @@ public class BillingConnector {
     /**
      * Called to cancel a subscription
      */
-    public final void unsubscribe(Activity activity, String productId) {
+    public final void unsubscribe(Activity activity, String packageName, String productId) {
         try {
-            String subscriptionUrl = "http://play.google.com/store/account/subscriptions?package=" + activity.getPackageName() + "&sku=" + productId;
+            String subscriptionUrl = "http://play.google.com/store/account/subscriptions?package=" + packageName + "&sku=" + productId;
 
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);

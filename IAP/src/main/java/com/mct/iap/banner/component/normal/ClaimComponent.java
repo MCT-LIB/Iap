@@ -8,6 +8,8 @@ import com.mct.iap.banner.IapBanner;
 import com.mct.iap.banner.component.billing.BillingComponent;
 import com.mct.iap.banner.component.billing.ProductConfiguration;
 
+import kotlin.Lazy;
+
 /**
  * ClaimComponent - A component for enabling users to claim an offer within an IapBanner.
  * <p>
@@ -20,6 +22,7 @@ import com.mct.iap.banner.component.billing.ProductConfiguration;
 public class ClaimComponent<C extends ClaimComponent<C>> extends Component<C> {
 
     private ProductConfiguration productConfiguration;
+    private Lazy<ProductConfiguration> productConfigurationLazy;
 
     /**
      * {@inheritDoc}
@@ -55,12 +58,18 @@ public class ClaimComponent<C extends ClaimComponent<C>> extends Component<C> {
     protected void setupOnClickListener(@NonNull IapBanner banner, View root) {
         if (view != null) {
             view.setOnClickListener(v -> {
-                if (productConfiguration == null) {
+                ProductConfiguration configuration = productConfiguration;
+                if (configuration == null && productConfigurationLazy != null) {
+                    configuration = productConfigurationLazy.getValue();
+                    if (configuration == null) {
+                        return;
+                    }
+                } else {
                     return;
                 }
                 BillingComponent component = banner.findComponentById(BillingComponent.ID);
                 if (component != null) {
-                    component.subscribe(productConfiguration);
+                    component.subscribe(configuration);
                 }
             });
         }
@@ -78,4 +87,15 @@ public class ClaimComponent<C extends ClaimComponent<C>> extends Component<C> {
         return (C) this;
     }
 
+    /**
+     * Sets the product ID for which the offer will be claimed.
+     *
+     * @param productConfigurationLazy - The product configuration lazy to set.
+     * @return The {@link ClaimComponent} instance for method chaining.
+     */
+    @SuppressWarnings("unchecked")
+    public C setProductConfigurationLazy(Lazy<ProductConfiguration> productConfigurationLazy) {
+        this.productConfigurationLazy = productConfigurationLazy;
+        return (C) this;
+    }
 }
