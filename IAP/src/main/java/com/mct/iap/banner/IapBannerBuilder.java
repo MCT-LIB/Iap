@@ -27,6 +27,8 @@ import com.mct.iap.banner.listener.OnBannerShowListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import kotlin.Lazy;
+
 /**
  * Class builder for {@link IapBanner}<br/>
  * This class provides a convenient way to create and configure {@link IapBanner} instances
@@ -323,6 +325,17 @@ public class IapBannerBuilder {
      */
     public ClaimComponent<?> bindClaim(@IdRes int id, ProductConfiguration configuration) {
         return bindComponent(id, new ClaimComponent<>(id)).setProductConfiguration(configuration);
+    }
+
+    /**
+     * Bind a Claim component.
+     *
+     * @param id            The resource ID of the View.
+     * @param configuration The configuration lazy.
+     * @return A ClaimComponent instance bound to the specified view.
+     */
+    public ClaimComponent<?> bindClaim(@IdRes int id, Lazy<ProductConfiguration> configuration) {
+        return bindComponent(id, new ClaimComponent<>(id)).setProductConfigurationLazy(configuration);
     }
 
     /**
