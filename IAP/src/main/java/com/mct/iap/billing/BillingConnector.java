@@ -706,12 +706,10 @@ public class BillingConnector {
             intent.setData(Uri.parse(subscriptionUrl));
 
             activity.startActivity(intent);
-            activity.finish();
         } catch (Exception e) {
             Log("Handling subscription cancellation: error while trying to unsubscribe");
             e.printStackTrace();
         }
-
     }
 
     /**
