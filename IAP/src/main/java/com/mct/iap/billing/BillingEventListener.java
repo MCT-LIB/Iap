@@ -2,7 +2,6 @@ package com.mct.iap.billing;
 
 import androidx.annotation.NonNull;
 
-import com.mct.iap.billing.enums.ProductType;
 import com.mct.iap.billing.models.BillingResponse;
 import com.mct.iap.billing.models.ProductInfo;
 import com.mct.iap.billing.models.PurchaseInfo;
@@ -20,10 +19,9 @@ public interface BillingEventListener {
     /**
      * Callback will be triggered when purchased products are queried from Play Console
      *
-     * @param purchases   - a list with owned products
-     * @param productType - the type of the product, either IN_APP or SUBS
+     * @param purchases - a list with owned products
      */
-    void onPurchasedProductsFetched(@NonNull ProductType productType, @NonNull List<PurchaseInfo> purchases);
+    void onPurchasedProductsFetched(@NonNull List<PurchaseInfo> purchases);
 
     /**
      * Callback will be triggered when a product is purchased successfully

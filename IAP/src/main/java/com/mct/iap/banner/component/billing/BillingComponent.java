@@ -11,7 +11,6 @@ import com.mct.iap.banner.IapBanner;
 import com.mct.iap.banner.component.BaseComponentAdapter;
 import com.mct.iap.billing.BillingConnector;
 import com.mct.iap.billing.BillingEventListener;
-import com.mct.iap.billing.enums.ProductType;
 import com.mct.iap.billing.enums.PurchasedResult;
 import com.mct.iap.billing.models.BillingResponse;
 import com.mct.iap.billing.models.ProductInfo;
@@ -291,9 +290,9 @@ public class BillingComponent extends BaseComponentAdapter {
         }
 
         @Override
-        public void onPurchasedProductsFetched(@NonNull ProductType productType, @NonNull List<PurchaseInfo> purchases) {
+        public void onPurchasedProductsFetched(@NonNull List<PurchaseInfo> purchases) {
             for (BillingEventListeners listener : listeners) {
-                listener.onPurchasedProductsFetched(banner, productType, purchases);
+                listener.onPurchasedProductsFetched(banner, purchases);
             }
         }
 

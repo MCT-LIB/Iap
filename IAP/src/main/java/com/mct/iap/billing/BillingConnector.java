@@ -11,7 +11,6 @@ import static com.android.billingclient.api.BillingClient.BillingResponseCode.OK
 import static com.android.billingclient.api.BillingClient.BillingResponseCode.SERVICE_DISCONNECTED;
 import static com.android.billingclient.api.BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE;
 import static com.android.billingclient.api.BillingClient.BillingResponseCode.USER_CANCELED;
-import static com.android.billingclient.api.BillingClient.FeatureType.SUBSCRIPTIONS;
 import static com.android.billingclient.api.BillingClient.ProductType.INAPP;
 import static com.android.billingclient.api.BillingClient.ProductType.SUBS;
 
@@ -34,9 +33,7 @@ import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.QueryProductDetailsParams;
-import com.android.billingclient.api.QueryPurchasesParams;
 import com.mct.iap.billing.enums.ErrorType;
-import com.mct.iap.billing.enums.ProductType;
 import com.mct.iap.billing.enums.PurchasedResult;
 import com.mct.iap.billing.enums.SkuProductType;
 import com.mct.iap.billing.enums.SupportState;
@@ -50,6 +47,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+
+@SuppressWarnings("UnusedReturnValue")
 public class BillingConnector {
 
     private static final String TAG = "BillingConnector";
@@ -61,6 +61,8 @@ public class BillingConnector {
 
     private final String base64Key;
 
+    private Handler handler;
+    private CompositeDisposable disposable;
     private BillingClient billingClient;
     private BillingEventListener billingEventListener;
 
@@ -101,7 +103,7 @@ public class BillingConnector {
                     switch (billingResult.getResponseCode()) {
                         case OK:
                             if (purchases != null) {
-                                processPurchases(ProductType.COMBINED, purchases, false);
+                                processPurchases(purchases, false);
                             }
                             break;
                         case USER_CANCELED:
@@ -278,6 +280,7 @@ public class BillingConnector {
             }
         }
 
+        allProductList.clear();
         allProductList.addAll(productInAppList);
         allProductList.addAll(productSubsList);
 
@@ -315,16 +318,8 @@ public class BillingConnector {
                         case OK:
                             isConnected = true;
                             Log("Billing service: connected");
-
-                            //query consumable and non-consumable product details
-                            if (!productInAppList.isEmpty()) {
-                                queryProductDetails(INAPP, productInAppList);
-                            }
-
-                            //query subscription product details
-                            if (!productSubsList.isEmpty()) {
-                                queryProductDetails(SUBS, productSubsList);
-                            }
+                            //start querying
+                            queryProductDetails(allProductList);
                             break;
                         case BILLING_UNAVAILABLE:
                             Log("Billing service: unavailable");
@@ -354,45 +349,31 @@ public class BillingConnector {
     /**
      * Fires a query in Play Console to show products available to purchase
      */
-    private void queryProductDetails(String productType, List<QueryProductDetailsParams.Product> productList) {
-        QueryProductDetailsParams productDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(productList).build();
+    private void queryProductDetails(List<QueryProductDetailsParams.Product> productList) {
+        getCompositeDisposable().add(Helper.queryProductDetails(billingClient, productList, (productDetails) -> {
+            if (productDetails.isEmpty()) {
+                Log("Query Product Details: data not found. Make sure product ids are configured on Play Console");
 
-        billingClient.queryProductDetailsAsync(productDetailsParams, (billingResult, productDetailsList) -> {
-            if (billingResult.getResponseCode() == OK) {
-                if (productDetailsList.isEmpty()) {
-                    Log("Query Product Details: data not found. Make sure product ids are configured on Play Console");
-
-                    findUiHandler().post(() -> billingEventListener.onBillingError(BillingConnector.this, new BillingResponse(ErrorType.BILLING_ERROR,
-                            "No product found", defaultResponseCode)));
-                } else {
-                    Log("Query Product Details: data found");
-
-                    List<ProductInfo> fetchedProductInfo = productDetailsList.stream().map(this::generateProductInfo).collect(Collectors.toList());
-                    fetchedProductInfoList.addAll(fetchedProductInfo);
-
-                    switch (productType) {
-                        case INAPP:
-                        case SUBS:
-                            findUiHandler().post(() -> billingEventListener.onProductsFetched(fetchedProductInfo));
-                            break;
-                        default:
-                            throw new IllegalStateException("Product type is not implemented");
-                    }
-
-                    List<String> fetchedProductIds = fetchedProductInfo.stream().map(ProductInfo::getProduct).collect(Collectors.toList());
-                    List<String> productListIds = productList.stream().map(QueryProductDetailsParams.Product::zza).collect(Collectors.toList()); //according to the documentation "zza" is the product id
-                    boolean isFetched = fetchedProductIds.stream().anyMatch(productListIds::contains);
-
-                    if (isFetched) {
-                        fetchPurchasedProducts();
-                    }
-
-                }
+                findUiHandler().post(() -> billingEventListener.onBillingError(BillingConnector.this, new BillingResponse(ErrorType.BILLING_ERROR,
+                        "No product found", defaultResponseCode)));
             } else {
-                Log("Query Product Details: failed");
-                findUiHandler().post(() -> billingEventListener.onBillingError(BillingConnector.this, new BillingResponse(ErrorType.BILLING_ERROR, billingResult)));
+                Log("Query Product Details: data found");
+
+                List<ProductInfo> fetchedProductInfo = productDetails.stream().map(this::generateProductInfo).collect(Collectors.toList());
+                fetchedProductInfoList.clear();
+                fetchedProductInfoList.addAll(fetchedProductInfo);
+
+                findUiHandler().post(() -> billingEventListener.onProductsFetched(fetchedProductInfo));
+
+                List<String> fetchedProductIds = fetchedProductInfo.stream().map(ProductInfo::getProduct).collect(Collectors.toList());
+                List<String> productListIds = productList.stream().map(QueryProductDetailsParams.Product::zza).collect(Collectors.toList()); //according to the documentation "zza" is the product id
+                boolean isFetched = fetchedProductIds.stream().anyMatch(productListIds::contains);
+
+                if (isFetched) {
+                    fetchPurchasedProducts();
+                }
             }
-        });
+        }));
     }
 
     /**
@@ -436,43 +417,14 @@ public class BillingConnector {
      */
     private void fetchPurchasedProducts() {
         if (billingClient.isReady()) {
-            billingClient.queryPurchasesAsync(
-                    QueryPurchasesParams.newBuilder().setProductType(INAPP).build(),
-                    (billingResult, purchases) -> {
-                        if (billingResult.getResponseCode() == OK) {
-                            if (purchases.isEmpty()) {
-                                Log("Query IN-APP Purchases: the list is empty");
-                            } else {
-                                Log("Query IN-APP Purchases: data found and progress");
-                            }
-
-                            processPurchases(ProductType.INAPP, purchases, true);
-                        } else {
-                            Log("Query IN-APP Purchases: failed");
-                        }
-                    }
-            );
-
-            //query subscription purchases for supported devices
-            if (isSubscriptionSupported() == SupportState.SUPPORTED) {
-                billingClient.queryPurchasesAsync(
-                        QueryPurchasesParams.newBuilder().setProductType(SUBS).build(),
-                        (billingResult, purchases) -> {
-                            if (billingResult.getResponseCode() == OK) {
-                                if (purchases.isEmpty()) {
-                                    Log("Query SUBS Purchases: the list is empty");
-                                } else {
-                                    Log("Query SUBS Purchases: data found and progress");
-                                }
-
-                                processPurchases(ProductType.SUBS, purchases, true);
-                            } else {
-                                Log("Query SUBS Purchases: failed");
-                            }
-                        }
-                );
-            }
-
+            getCompositeDisposable().add(Helper.queryPurchases(billingClient, purchases -> {
+                if (purchases.isEmpty()) {
+                    Log("Query Purchases: the list is empty");
+                } else {
+                    Log("Query Purchases: data found and progress");
+                }
+                processPurchases(purchases, true);
+            }));
         } else {
             findUiHandler().post(() -> billingEventListener.onBillingError(BillingConnector.this, new BillingResponse(ErrorType.FETCH_PURCHASED_PRODUCTS_ERROR,
                     "Billing client is not ready yet", defaultResponseCode)));
@@ -484,25 +436,13 @@ public class BillingConnector {
      * Not all devices support subscriptions
      */
     public SupportState isSubscriptionSupported() {
-        BillingResult response = billingClient.isFeatureSupported(SUBSCRIPTIONS);
-
-        switch (response.getResponseCode()) {
-            case OK:
-                Log("Subscriptions support check: success");
-                return SupportState.SUPPORTED;
-            case SERVICE_DISCONNECTED:
-                Log("Subscriptions support check: disconnected. Trying to reconnect...");
-                return SupportState.DISCONNECTED;
-            default:
-                Log("Subscriptions support check: error -> " + response.getResponseCode() + " " + response.getDebugMessage());
-                return SupportState.NOT_SUPPORTED;
-        }
+        return Helper.isSubscriptionSupported(billingClient);
     }
 
     /**
      * Checks purchases signature for more security
      */
-    private void processPurchases(ProductType productType, @NonNull List<Purchase> allPurchases, boolean purchasedProductsFetched) {
+    private void processPurchases(@NonNull List<Purchase> allPurchases, boolean purchasedProductsFetched) {
         List<PurchaseInfo> signatureValidPurchases = new ArrayList<>();
 
         //create a list with signature valid purchases
@@ -529,7 +469,7 @@ public class BillingConnector {
 
         if (purchasedProductsFetched) {
             fetchedPurchasedProducts = true;
-            findUiHandler().post(() -> billingEventListener.onPurchasedProductsFetched(productType, signatureValidPurchases));
+            findUiHandler().post(() -> billingEventListener.onPurchasedProductsFetched(signatureValidPurchases));
         } else {
             findUiHandler().post(() -> billingEventListener.onProductsPurchased(signatureValidPurchases));
         }
@@ -750,9 +690,18 @@ public class BillingConnector {
      * <p>
      * BillingEventListener runs on it
      */
-    @NonNull
     private Handler findUiHandler() {
-        return new Handler(Looper.getMainLooper());
+        if (handler == null) {
+            handler = new Handler(Looper.getMainLooper());
+        }
+        return handler;
+    }
+
+    private CompositeDisposable getCompositeDisposable() {
+        if (disposable == null || disposable.isDisposed()) {
+            disposable = new CompositeDisposable();
+        }
+        return disposable;
     }
 
     /**
@@ -770,6 +719,14 @@ public class BillingConnector {
      * To avoid leaks this method should be called when BillingConnector is no longer needed
      */
     public void release() {
+        if (disposable != null) {
+            disposable.dispose();
+            disposable = null;
+        }
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+            handler = null;
+        }
         if (billingClient != null && billingClient.isReady()) {
             Log("BillingConnector instance release: ending connection...");
             billingClient.endConnection();
