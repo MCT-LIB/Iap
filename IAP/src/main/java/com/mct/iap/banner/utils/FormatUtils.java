@@ -5,14 +5,18 @@ import androidx.annotation.NonNull;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Currency;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class FormatUtils {
+
 
     @NonNull
     public static String formatTime(int value) {
         return value < 10 ? "0" + value : String.valueOf(value);
     }
+
 
     @NonNull
     public static String formatMoney(float value, String priceCurrencyCode) {
@@ -36,7 +40,14 @@ public class FormatUtils {
         }
     }
 
+    private static final Map<String, Locale> sLocaleCache = new HashMap<>();
+
     private static Locale findLocale(String priceCurrencyCode, Locale fallback) {
+        for (Map.Entry<String, Locale> entry : sLocaleCache.entrySet()) {
+            if (entry.getKey().equals(priceCurrencyCode) && entry.getValue() != null) {
+                return entry.getValue();
+            }
+        }
         Currency c = Currency.getInstance(priceCurrencyCode);
         NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
         numberFormat.setCurrency(c);
@@ -45,6 +56,7 @@ public class FormatUtils {
             try {
                 Currency currency = Currency.getInstance(locale);
                 if (formattedValue.contains(currency.getSymbol())) {
+                    sLocaleCache.put(priceCurrencyCode.toLowerCase(), locale);
                     return locale;
                 }
             } catch (Exception ignored) {
@@ -72,4 +84,7 @@ public class FormatUtils {
         }
     }
 
+    private FormatUtils() {
+        //no instance
+    }
 }
