@@ -60,15 +60,13 @@ public class ClaimComponent<C extends ClaimComponent<C>> extends Component<C> {
                 ProductConfiguration configuration = productConfiguration;
                 if (configuration == null && productConfigurationLazy != null) {
                     configuration = productConfigurationLazy.get();
-                    if (configuration == null) {
-                        return;
-                    }
-                } else {
-                    return;
                 }
                 BillingComponent component = banner.findComponentById(BillingComponent.ID);
-                if (component != null) {
+                if (component != null && configuration != null) {
                     component.subscribe(configuration);
+                }
+                if (clickListener != null) {
+                    clickListener.onClick(v);
                 }
             });
         }
